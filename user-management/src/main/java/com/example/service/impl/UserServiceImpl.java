@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +31,6 @@ import com.example.entity.User;
 import com.example.error.exception.DuplicateUserFoundException;
 import com.example.error.exception.InvalidOtpException;
 import com.example.error.exception.ResourceNotFoundException;
-import com.example.error.exception.UnableToSendMailException;
 import com.example.repository.RoleRepository;
 import com.example.repository.UserRepository;
 import com.example.service.UserService;
@@ -58,27 +56,22 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User registerNewUser(UserDto userDto, String siteURL) throws UnsupportedEncodingException {
-		try {
-			Optional<User> userByEmail = userRepository.findByEmail(userDto.getEmail());
-			if (userByEmail.isEmpty()) {
-				User user = modelMapper.map(userDto, User.class);
-				user.setPassword(passwordEncoder.encode(user.getPassword()));
-				user.setVerificationCode(RandomString.make(64));
-				user.setCreatedOn(new Timestamp(new Date().getTime()));
-				user.setModifiedOn(new Timestamp(new Date().getTime()));
-				user.setIsActive(Boolean.FALSE);
-				user.setUsername(userDto.getName());
-				user.setEmail(userDto.getEmail());
-				Role role = roleRepository.findById(502).get();
-				user.getRoles().add(role);
-				userUtils.sendVerificationEmail(user, siteURL);
-				User save = userRepository.save(user);
-				return save;
-			} else {
-				throw new DuplicateUserFoundException("Duplicate User Found !!");
-			}
-		} catch (MessagingException e) {
-			throw new UnableToSendMailException("unable to send mail:  " + e.getMessage());
+		Optional<User> userByEmail = userRepository.findByEmail(userDto.getEmail());
+		if (userByEmail.isEmpty()) {
+			User user = modelMapper.map(userDto, User.class);
+			user.setPassword(passwordEncoder.encode(user.getPassword()));
+			user.setVerificationCode(RandomString.make(64));
+			user.setCreatedOn(new Timestamp(new Date().getTime()));
+			user.setModifiedOn(new Timestamp(new Date().getTime()));
+			user.setIsActive(Boolean.FALSE);
+			user.setUsername(userDto.getName());
+			user.setEmail(userDto.getEmail());
+			Role role = roleRepository.findById(502).get();
+			user.getRoles().add(role);
+			userUtils.sendVerificationEmail(user, siteURL);
+			return userRepository.save(user);
+		} else {
+			throw new DuplicateUserFoundException("Duplicate User Found !!");
 		}
 	}
 

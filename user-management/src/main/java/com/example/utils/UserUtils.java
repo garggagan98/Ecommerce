@@ -1,8 +1,5 @@
 package com.example.utils;
 
-import java.io.UnsupportedEncodingException;
-
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -36,8 +33,7 @@ public class UserUtils {
 	private TwilioConfig config;
 
 	@Async
-	public void sendVerificationEmail(User user, String siteURL)
-			throws UnsupportedEncodingException, MessagingException {
+	public void sendVerificationEmail(User user, String siteURL) {
 		// send mail
 		String to = user.getEmail();
 		String from = "EcommerceWebsite@gmail.com";
