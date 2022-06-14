@@ -1,0 +1,11 @@
+This project contains below mentioned features
+
+Tech Stack : Spring Boot, JPA, Mockito, Junit5, Twilio, Javax Mail, Hibernate, MYSQL, Microservices, JWT, Spring Security, Spring Cloud Gateway, Kubernetes, Docker etc
+
+1) User email verification system
+2) Forgot password feature using twilio API
+3) Microservices achitecture having API gateway level authentication and authorization using JWT Tokens (Auth0)
+4) Eureka Discovery Server
+5) RestTemplate for interservice communication
+6) Mockito and JUNIT5 for testcases with code coverage above 90%
+7) Spring Security.
