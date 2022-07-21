@@ -21,3 +21,4 @@ public class ErrorResponse implements Serializable {
 
 	String errorMessage;
 }
+	

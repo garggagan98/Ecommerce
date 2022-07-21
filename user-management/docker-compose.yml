@@ -1,82 +1,72 @@
 version: '3'
 services:
-  mysql-standalone:
-    image: 'mysql:5.7'
+  order-service:
+    container_name: order-service
+    image: gagan1996/orderservice
+    restart: on-failure
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_PASSWORD=root
-      - MYSQL_DATABASE=ecommerceDB
+      PROFILE: "prod"
     ports:
-      - "3307:3306"
-    networks:
-        - estri_gateway_network
-  user-management-service:
-    image: user-management-service
-    ports:
-      - "9000:9000"
-    networks:
-        - estri_gateway_network
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-standalone:3306/ecommerceDB?autoReconnect=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: "root"
-      SPRING_DATASOURCE_PASSWORD: "root"
-    build:
-      context: "./"
-      dockerfile: "DockerFile"
+      - 9002:9002
     depends_on:
-      - mysql-standalone
-  product-management-service:
-    image: product-management-service
-    ports:
-      - "9001:9001"
-    networks:
-        - estri_gateway_network
+      - docker-mysql
+      - gateway-service
+      - eureka-service
+      - product-service
+  product-service:
+    container_name: product-service
+    image: gagan1996/productservice
+    restart: on-failure
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-standalone:3306/ecommerceDB?autoReconnect=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: "root"
-      SPRING_DATASOURCE_PASSWORD: "root"
-    build:
-      context: "./"
-      dockerfile: "DockerFile"
+      PROFILE: "prod"
+    ports:
+      - 9001:9001
     depends_on:
-      - mysql-standalone
-  order-management-service:
-    image: order-management-service
-    ports:
-      - "9002:9002"
-    networks:
-        - estri_gateway_network
+      - docker-mysql
+      - gateway-service
+      - eureka-service
+  user-service:
+    container_name: user-service
+    image: gagan1996/userservice
+    restart: on-failure
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-standalone:3306/ecommerceDB?autoReconnect=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: "root"
-      SPRING_DATASOURCE_PASSWORD: "root"
-    build:
-      context: "./"
-      dockerfile: "DockerFile"
+      PROFILE: "prod"
+      EMAIL_USERNAME: "dronedeliverysystem@gmail.com"
+      EMAIL_PASSWORD: "xywxylpshodcqvda"
+      TWILIO_AUTH_TOKEN: "d68a6e74cc9b328528ebbc5f4e752f78"
+      TWILIO_ACCOUNT_SID: "AC6eb1cfe9fa0d911513f05515dab83037"
+    ports:
+      - 9000:9000
     depends_on:
-      - mysql-standalone
-  discovery-service:
-    image: discovery-service
-    ports:
-      - "8761:8761"
-    networks:
-        - estri_gateway_network
+      - docker-mysql
+      - gateway-service
+      - eureka-service
+  gateway-service:
+    container_name: gateway-service
+    image: gagan1996/gatewayservice
+    restart: on-failure
     environment:
-        EUREKA_APPLICATION_NAME: eureka
-        HOST_NAME: localhost
-    build:
-      context: "./"
-      dockerfile: "DockerFile"
-  cloud-gateway-service:
-    image: cloud-gateway-service
+      PROFILE: "prod"
     ports:
-      - "8000:8000"
-    networks:
-        - estri_gateway_network
+      - 8000:8000
+    depends_on:
+      - docker-mysql
+      - eureka-service
+  eureka-service:
+    container_name: eureka-service
+    image: gagan1996/eurekaservice
+    restart: on-failure
+    ports:
+      - 8761:8761
+    depends_on:
+      - docker-mysql
+  docker-mysql:
+    container_name: docker-mysql
+    image: mysql
+    restart: always
     environment:
-        HOST_NAME: localhost
-    build:
-      context: "./"
-      dockerfile: "DockerFile"
-networks: 
-  estri_gateway_network: 
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "ecommerceDB"
+      MYSQL_HOST: "%"
+    ports:
+      - 6666:3306

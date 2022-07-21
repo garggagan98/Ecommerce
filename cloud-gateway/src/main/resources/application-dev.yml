@@ -1,0 +1,48 @@
+server:
+  port: 8000
+  
+spring:
+  application.name: cloud-gateway
+  cloud:
+    gateway:
+      discovery.locator.enabled: true
+      routes:
+        - id: user-service-id
+          uri: lb://user-management-service
+          predicates:
+            Path=/user/**
+          filters:     
+            - name: CircuitBreaker
+              args:
+                name: orderCircuitBreaker
+                fallbackUri: forward:/fallback
+            
+        - id: product-service-id
+          uri: lb://product-management-service
+          predicates:
+            - Path=/product/**,/cart/**,/category/**,/seller/**
+          filters:
+            - name: AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: orderCircuitBreaker
+                fallbackUri: forward:/fallback
+
+        - id: order-service-id
+          uri: lb://order-management-service
+          predicates:
+            - Path=/order/**
+          filters:
+            - name: AuthFilter
+            - name: CircuitBreaker
+              args:
+                name: orderCircuitBreaker
+                fallbackUri: forward:/fallback
+          
+  main:
+    web-application-type: reactive
+eureka:
+  client:
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka

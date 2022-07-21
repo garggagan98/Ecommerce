@@ -1,0 +1,34 @@
+server:
+  port: 8000
+  
+spring:
+  application.name: cloud-gateway
+  cloud:
+    gateway:
+      discovery.locator.enabled: true
+      routes:
+        - id: user-service-id
+          uri: lb://user-management-service
+          predicates:
+            Path=/user/**     
+          
+        - id: product-service-id
+          uri: lb://product-management-service
+          predicates:
+            - Path=/product/**,/cart/**,/category/**,/seller/**
+          filters:
+          - AuthFilter
+
+        - id: order-service-id
+          uri: lb://order-management-service
+          predicates:
+            - Path=/order/**
+          filters:
+          - AuthFilter
+  main:
+    web-application-type: reactive
+eureka:
+  client:
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka

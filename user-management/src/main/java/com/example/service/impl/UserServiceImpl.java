@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User registerNewUser(UserDto userDto, String siteURL) throws UnsupportedEncodingException {
 		Optional<User> userByEmail = userRepository.findByEmail(userDto.getEmail());
+		System.out.println(siteURL);
 		if (userByEmail.isEmpty()) {
 			User user = modelMapper.map(userDto, User.class);
 			user.setPassword(passwordEncoder.encode(user.getPassword()));

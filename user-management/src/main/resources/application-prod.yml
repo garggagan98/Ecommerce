@@ -2,17 +2,16 @@ eureka:
   client:
     fetch-registry: true
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka-service:8761/eureka
+    
 server:
   port: 9000
-  
 spring:
   application:
     name: user-management-service
-    
   datasource:
     password: root
-    url: jdbc:mysql://localhost:3306/ecommerceDB?createDatabaseIfNotExist=true
+    url: jdbc:mysql://docker-mysql:3306/ecommerceDB?createDatabaseIfNotExist=true
     username: root
     
   freemarker:
@@ -25,7 +24,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-      
+     
 twilio:
   account_sid: ${TWILIO_ACCOUNT_SID}
   auth_token: ${TWILIO_AUTH_TOKEN}
